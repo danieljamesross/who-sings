@@ -1,68 +1,30 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+# Goal of the game:
+Choose the artist that sings a specific line of lyrics, winning points for every correct choice
 
-In the project directory, you can run:
+## Must have features:
+  - quiz card with one line of lyrics and 3 artists to choose from
+  - the game ends after completing N quiz cards, one after the other
+  - ask the name of the player with the ability to log off so that another user could play
+  - count the points and save them at the end of the game
+  - the screens of the game should be:
+    - the quiz screen
+    - the user's screen where they can see their name and the points of the last N games
+    - the high score screen where you can see a chart of the best players
 
-### `yarn start`
+## Nice to have:
+  - game time countdown for every quiz card, once it runs out you pass to the next quiz card without getting any points
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Notes:
+  - you can use localStorage for saving data and user session, no need for a DB
+  - don't worry too much about the design, we'll not judge that :) you can also use some CSS library if you want to
+  - the app should be built using React (or React Native if you feel like experimenting)
+  - other technology choices like various JS libs, are up to you
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+### TODO:
+  - Make the API calls fill in the questions, async broken at the moment
+  - Save user data to localStorage. This is half broken at the moment, updates
+    just fine except `score` doesn't match the printed (actual) score.
+  - Log off button
+  - history game

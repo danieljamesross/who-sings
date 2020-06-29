@@ -1,38 +1,89 @@
-.App {
-  text-align: center;
+.container {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+    color: white;
+    text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+h1,
+h2 {
+    margin: 10px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.lyric {
+    font-style: italic;
+}
+ol.leaderboard {
+    text-align: left;
+    font-size: 12pt;
+}
+.answer {
+    border: 1px solid #fff;
+    padding: 5px 10px 5px 45px;
+    width: 610px;
+    text-align: left;
+    margin-top: 10px;
+    position: relative;
+    font-size: 22px;
+    cursor: pointer;
+    transition: ease-in-out, width 0.35s ease-in-out;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.answer.selected {
+    color: #4f4c4c;
+    background-color: #c8ffbb;
 }
 
-.App-link {
-  color: #61dafb;
+.answer:hover {
+    color: #4f4c4c;
+    background-color: #c8ffbb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.answer:focus {
+    outline: none;
+}
+
+.results span.correct {
+    color: #c8ffbb;
+}
+
+.results span.incorrect {
+    color: #f27c7c;
+}
+
+.error {
+    color: #f27c7c;
+}
+
+.letter {
+    color: #4f4c4c;
+    width: 30px;
+    position: absolute;
+    left: 0;
+    text-align: center;
+    height: 28px;
+    top: 0;
+    padding: 5px;
+    text-transform: uppercase;
+}
+
+.btn {
+    color: #4f4c4c;
+    background-color: #f4f4f4;
+    padding: 10px 50px;
+    text-transform: uppercase;
+    font-size: 18px;
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    color: #4f4c4c;
+    background-color: #ffc107;
+    font-weight: bold;
 }
