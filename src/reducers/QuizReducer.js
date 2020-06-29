@@ -9,7 +9,9 @@ import {
     SET_SHOW_PLAYER_SCREEN,
     SET_COUNT,
     SET_NAME,
-    SET_NAME_ERROR
+    SET_NAME_ERROR,
+    SET_QUESTIONS,
+    QUESTIONS_LOADED
 } from './Types.js';
 
 function QuizReducer(state, action) {
@@ -24,6 +26,16 @@ function QuizReducer(state, action) {
 		...state,
 		currentQuestion: action.currentQuestion,
 	    };
+	case SET_QUESTIONS:
+	    return {
+		...state,
+		questions: action.questions,
+	    };
+    case QUESTIONS_LOADED:
+	return {
+	    ...state,
+	    questionsLoaded: action.questionsLoaded,
+	};
 	case SET_ERROR:
 	    return {
 		...state,

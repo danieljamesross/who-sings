@@ -1,5 +1,5 @@
 import React, { useReducer, useState, useRef, useEffect, useContext } from 'react';
-import questions from './components/Questions';
+import generateQuestions from './components/Questions';
 import Progress from './components/Progress';
 import Question from './components/Question';
 
@@ -20,25 +20,19 @@ import {
     SET_SHOW_PLAYER_SCREEN,
     SET_COUNT,
     SET_NAME,
-    SET_NAME_ERROR
+    SET_NAME_ERROR,
+    SET_QUESTIONS,
+    QUESTIONS_LOADED
 } from './reducers/Types.js';
 import QuizReducer from './reducers/QuizReducer.js';
 import './App.css';
 
 function App() {
 
-	const [qs, setQs] = React.useState([]);
-	React.useEffect(() => {
-		const getQuestions = async () => {
-			const questionsData = await questions(3);
-			setQs(questionsData);
-		};
-		getQuestions();
-	  }, []);
-
     const initialState = {
 	score: 0,
-	qs,
+	questions: [],
+	questionsLoaded: false,
 	currentQuestion: 0,
 	currentAnswer: '',
 	answers: [],
@@ -51,10 +45,24 @@ function App() {
 	nameError: ""
     };
     const [state, dispatch] = useReducer(QuizReducer, initialState);
-    const {score, currentQuestion, currentAnswer, answers, showResults, error, showPlayerScreen,count, name, nameError} = state;
+    const {score, currentQuestion, currentAnswer, answers, showResults, error, showPlayerScreen,count, name, nameError, questions, questionsLoaded} = state;
     const now = new Date().getDate() + '/' + new Date().getMonth() + '/' + new Date().getFullYear();
+
+    // This bit was very awkward but it does now seem to work.
+    const setQuestions = async () => {
+	const qs = await generateQuestions(3);
+	return dispatch({type: SET_QUESTIONS, questions: qs});
+    };
+    if (!questionsLoaded) {
+	setQuestions().then(
+	    dispatch({type: QUESTIONS_LOADED, questionsLoaded: true})
+	);
+    };
+    
     const question = questions[currentQuestion];
 
+    console.dir(question);
+    
     const renderError = () => {
 	if (!error) {
 	    return;
