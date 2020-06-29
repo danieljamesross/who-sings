@@ -31,23 +31,29 @@ const mxm = "https://api.musixmatch.com/ws/1.1/chart.tracks.get?format=jsonp&cal
 
 
 const fetchTracks = async (url) => {
-    const response = await Axios({
+   const response = await Axios({
 	url: url,
 	adapter: jsonpAdapter,
 	callbackParamName: 'callback' // optional, 'callback' by default
     });
-    const data = await response.data.message.body.track_list ;
-    return await data;
+    /*let axios = Axios.create({
+        baseURL: 'https://api.musixmatch.com/ws/',
+        headers: {'Access-Control-Allow-Origin': 'http://localhost:3000'}
+    });*/
+    //let response = await axios.get(url);
+
+    return response.data.message.body.track_list ;
 };
 
 console.log(fetchTracks(3));
 
-const generateQuestions = //async
-      (qnum) => {
-    // const tracks = await fetchTracks(mxm);
+/*
+const generateQuestions = 
+    async function() {
+    const tracks = await fetchTracks(mxm);
     const questionArray = [];
     let questionItem = {};
-    for(var i = 0; i<qnum; i++) {
+    for(var i = 0; i<tracks.length; i++) {
 	questionItem.id = i + 1;
 	questionItem.question = 'this is question number ' + (i + 1); 
 	questionItem.answer_a = 'Answer a'; //tracks[i].track.track_name;
@@ -60,8 +66,33 @@ const generateQuestions = //async
     console.log("qarr: " + questionArray);
     return questionArray;
 };
+*/
 
+const generateQuestions = 
+    function() {
+    
+    return fetchTracks(mxm).then((tracks) => {
 
-const questions = generateQuestions(3);
+        const questionArray = [];
+        let questionItem = {};
+        for(var i = 0; i<tracks.length; i++) {
+        questionItem.id = i + 1;
+        questionItem.question = 'this is question number ' + (i + 1); 
+        questionItem.answer_a = tracks[i].track.track_name;
+        questionItem.answer_b = 'Answer b';
+        questionItem.answer_c = 'Answer c';
+        questionItem.correct_answer  = 'b';
+        questionArray.push(questionItem);
+        questionItem = {};
+        };
+        console.log("qarr: " + questionArray);
+        return questionArray;
 
-export default questions;
+    });
+    
+};
+
+//const questions = generateQuestions(3);
+
+export default generateQuestions;
+

@@ -26,9 +26,19 @@ import QuizReducer from './reducers/QuizReducer.js';
 import './App.css';
 
 function App() {
+
+	const [qs, setQs] = React.useState([]);
+	React.useEffect(() => {
+		const getQuestions = async () => {
+			const questionsData = await questions(3);
+			setQs(questionsData);
+		};
+		getQuestions();
+	  }, []);
+
     const initialState = {
 	score: 0,
-	questions,
+	qs,
 	currentQuestion: 0,
 	currentAnswer: '',
 	answers: [],
