@@ -1,29 +1,3 @@
-// const questions = [
-//     {
-// 	id: 1,
-// 	question: "I hate myself! La la la dee dee dooo",
-// 	answer_a: "Eminem",
-// 	answer_b: "Your mum",
-// 	answer_c: "Britt",
-// 	correct_answer: 'c',
-//     },
-//     {
-// 	id: 2,
-// 	question: "Death to the aristos",
-// 	answer_a: "FFS",
-// 	answer_b: "Hell",
-// 	answer_c: "death",
-// 	correct_answer: 'c',
-//     },
-//     {
-//  	id: 3,
-//  	question: "another q",
-//  	answer_a: "FFS",
-//  	answer_b: "Hell",
-//  	answer_c: "death",
-//  	correct_answer: 'c',
-//     },
-// ];
 import Axios from 'axios';
 import localApiData from '../api/trackList.json';
 import jsonpAdapter from 'axios-jsonp';
