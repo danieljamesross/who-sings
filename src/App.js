@@ -65,14 +65,14 @@ function App() {
     
     const renderError = () => {
 	if (!error) {
-	    return;
+	    return null;
 	}
 	return <div className="error">{error}</div>;
     };
 
     const renderNameError = () => {
 	if (!nameError) {
-	    return;
+	    return null;
 	}
 	return <div className="error">{nameError}</div>;
     };
