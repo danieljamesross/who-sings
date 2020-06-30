@@ -2,12 +2,11 @@ import React, { useReducer, useState, useRef, useEffect, useContext } from 'reac
 import generateQuestions from './components/Questions';
 import Progress from './components/Progress';
 import Question from './components/Question';
-
+import Player from './components/Player';
 import highScores from './components/HighScores';
 //import Counter from './components/Counter';
 import Answers from './components/Answers';
 //import Login from './components/Login';
-import Leaderboard from './components/Leaderboard';
 import QuizContext from './context/QuizContext';
 import {
     SET_ANSWERS,
@@ -22,7 +21,11 @@ import {
     SET_NAME,
     SET_NAME_ERROR,
     SET_QUESTIONS,
-    QUESTIONS_LOADED
+    QUESTIONS_LOADED,
+    IS_LOADING,
+    SET_NEW_SCORE,
+    UPDATE_LEADERBOARD,
+//    UPDATE_LOCAL_STORAGE
 } from './reducers/Types.js';
 import QuizReducer from './reducers/QuizReducer.js';
 import './App.css';
@@ -41,27 +44,32 @@ function App() {
 	highScores,
 	showPlayerScreen: true,
 	count: 3,
+	isLoading: true,
 	name: "",
-	nameError: ""
+	nameError: "",
     };
-    const [state, dispatch] = useReducer(QuizReducer, initialState);
-    const {score, currentQuestion, currentAnswer, answers, showResults, error, showPlayerScreen,count, name, nameError, questions, questionsLoaded} = state;
-    const now = new Date().getDate() + '/' + new Date().getMonth() + '/' + new Date().getFullYear();
 
-    // This bit was very awkward but it does now seem to work.
+    const [state, dispatch] = useReducer(QuizReducer, initialState);
+    const {score, currentQuestion, currentAnswer, answers, showResults, error, showPlayerScreen,count, name, nameError, questions, questionsLoaded, isLoading,} = state;
+    const d = new Date();
+    const month = d.getMonth() + 1;
+    const now = d.getDate() + '/' + month + '/' + d.getFullYear();
+    // We have to wait for the questions to be fetched from the API
+    // before we can do anything. So we declare an async function...
     const setQuestions = async () => {
-	const qs = await generateQuestions(3);
+	const qs = await generateQuestions(5); // how many questions?
 	return dispatch({type: SET_QUESTIONS, questions: qs});
     };
+    // ... and then call it once.
     if (!questionsLoaded) {
-	setQuestions().then(
-	    dispatch({type: QUESTIONS_LOADED, questionsLoaded: true})
-	);
+
+	setQuestions().then(() => {
+	    dispatch({type: IS_LOADING, isLoading: false});
+	    dispatch({type: QUESTIONS_LOADED, questionsLoaded: true});
+	});
     };
     
     const question = questions[currentQuestion];
-
-    //console.dir(question);
     
     const renderError = () => {
 	if (!error) {
@@ -97,9 +105,9 @@ function App() {
 
 	    return (
 		<div key={question.id}>
-		    Question {question.id}:&nbsp;
+		    Q {question.id}:&nbsp;
 		    <span className="lyric">
-			{question.question}
+			"{question.question}"
 		    </span>&nbsp;-&nbsp;
 		{renderResultsMark(question,answer)}
 		</div>
@@ -109,11 +117,17 @@ function App() {
     const restart = () => {
 	dispatch({type: RESET_QUIZ});
     };
+    
+    const logout = () => {
+	dispatch({type: SET_NAME, name: ""});
+	dispatch({type: SET_SHOW_PLAYER_SCREEN, showPlayerScreen: true});
+	restart();
+    }
+
 
     const incScore = (question, answer) => {
 	if(question.correct_answer === answer.answer) {
 	    dispatch({type: SET_SCORE, score: score + 1});
-	    return;
 	}
 	return;
     };
@@ -141,8 +155,15 @@ function App() {
 	    dispatch({type: SET_COUNT, count: 3});
 	    return;
 	} else {
-
-	   
+	    dispatch({type: UPDATE_LEADERBOARD,
+		      highScores: highScores.push({
+			  name: name,
+			  score: score,
+			  time: now,
+		      })
+		     });
+	    console.log("hs: " + highScores);
+	    localStorage.setItem("highScores", JSON.stringify(highScores));
 	    dispatch({type: SET_SHOW_RESULTS, showResults: true});
 	};
 
@@ -154,10 +175,9 @@ function App() {
 	return;
     };
 
-    // if (!name) {
-    // 	dispatch({type: SET_NAME_ERROR, nameError: 'Please enter a usernamee'});
-    // 	return;
-    // }
+  
+    // localStorage.setItem('highScores', JSON.stringify(highScores));
+    // dispatch({type: UPDATE_LEADERBOARD, highScores: highScores});
 
     const Counter = () => {
     	const [time, setTime] = useState(new Date().toLocaleTimeString());
@@ -191,39 +211,96 @@ function App() {
     	    );
     }};
 
-    // highScores.push(newScore);
-    // localStorage.setItem('highScores', JSON.stringify(highScores));
-    // dispatch({type: UPDATE_LEADERBOARD, highScores: highScores});
+
     const closePlayerScreen = () => {
-	dispatch({type: SET_SHOW_PLAYER_SCREEN, showPlayerScreen: false});
+	if (!name) {
+ 	    dispatch({type: SET_NAME_ERROR, nameError: 'Please enter a username'});
+ 	    return;
+	} else {
+	    dispatch({type: SET_SHOW_PLAYER_SCREEN, showPlayerScreen: false});
+	}
 	return;
     };
 
-    if (showResults) {
+    const showHighScores = () => {
+	if (highScores) {
+	    let sorted = highScores;
+	    if (highScores.length > 1) {
+		sorted = highScores.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
+	    }
+	    
+	    const scores = sorted.map((e, index) => 
+		<li key={index}>{e.name} scored {e.score} on {e.time}</li>
+	    );
+	    
+	    return (
+		<div className="results">
+		    <h3>HighScores</h3>
+		    {scores}
+		</div>
+	    );
+	} else return null;
+    };
+
+    const showPlayerScores = () => {
+	const playerScores = [];
+	highScores.map((e, index) => {
+	    if (e.name == name) {
+		playerScores.push(<li key={index}>{e.score} on {e.time}</li>);
+	    }
+	});
+	if (playerScores){
+	    return (
+		<div className="results">
+		    <h3>{name}'s Recent Scores</h3>
+		    {playerScores}
+		</div>
+	    );
+	} else return null;
+    }
+
+    if (isLoading) {
+	return (
+	    <div className="container loading">
+		<h3>Loading...</h3>
+	    </div>
+	);
+    } 
+    else if (showResults) {
 	return (
 	    <div className="container results">
 		<h2>Results</h2>
 		<ul>{renderResultsData()}</ul>
 		{renderScore()}
 		<button className="btn btn-primary"
-			onClick={restart}>
+		    onClick={restart}>
 		    Restart</button>
+		<button className="btn btn-primary"
+		    onClick={logout}>
+		    Logout</button>
+		{showHighScores()}
+		{showPlayerScores()}
 	    </div>
 	);
     } else if (showPlayerScreen) {
 	return (
 	    <QuizContext.Provider value={{state, dispatch}}>
 		<div className="container player">
-		    <h2>Enter your username</h2>
+		    <h1>Who Sings?</h1>
+		    <h3>Enter your username:</h3>
+		    {renderNameError()}
 		    <form>
 			<input value={name}
-			       onChange={e => dispatch({type: SET_NAME, name: e.target.value})}
-			       placeholder="Enter name..."
+			       onChange={e => dispatch({
+				   type: SET_NAME,
+				   name: e.target.value})}
+			       placeholder={name}
 			/>
 		    </form>
 		    <button className="btn btn-primary"
-			onClick={closePlayerScreen}>
-			Play</button>
+			    onClick={closePlayerScreen}>
+			Start
+		    </button>
 		</div>
 	    </QuizContext.Provider>
 	);
@@ -232,19 +309,19 @@ function App() {
 	return (
 	    <QuizContext.Provider value={{state, dispatch}}>
 		<div className="container">
-		    <Progress total={questions.length} current={currentQuestion + 1} />
-		    <h2>Who sings the following line?</h2>
+		    <Progress total={questions.length}
+			      current={currentQuestion + 1} />
+		    <h2>{name}, who sings the following line?</h2>
 		    <Question />
 		    {renderError()}
 		    <Answers />
 		    <button className="btn btn-primary"
 			onClick={next}>
 			Submit</button>
-		    <Leaderboard />
 		</div>
 	    </QuizContext.Provider>
 	);
-    }
+    } 
 }
 
 export default App;

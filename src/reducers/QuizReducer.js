@@ -11,7 +11,10 @@ import {
     SET_NAME,
     SET_NAME_ERROR,
     SET_QUESTIONS,
-    QUESTIONS_LOADED
+    QUESTIONS_LOADED,
+    IS_LOADING,
+    SET_NEW_SCORE,
+    UPDATE_LEADERBOARD
 } from './Types.js';
 
 function QuizReducer(state, action) {
@@ -31,6 +34,20 @@ function QuizReducer(state, action) {
 		...state,
 		questions: action.questions,
 	    };
+    case IS_LOADING:
+	    return {
+		...state,
+		isLoading: action.isLoading,
+	    };
+    case SET_NEW_SCORE:
+	return {
+	    ...state,
+	    newScore: {
+		name: action.name,
+		score: action.score,
+		time: action.time,
+	    },
+	};
     case QUESTIONS_LOADED:
 	return {
 	    ...state,
@@ -74,7 +91,6 @@ function QuizReducer(state, action) {
 		currentAnswer: '',
 		currentQuestion: 0,
 		showResults: false,
-		showPlayerScreen: false,
 		error: '',
 		count: 10,
 	    };
@@ -88,7 +104,16 @@ function QuizReducer(state, action) {
 		...state,
 		name: action.name,
 	    };
-	default:
+    case UPDATE_LEADERBOARD:
+	return {
+	    ...state,
+	    highScores: action.highScores,
+	};
+    // case UPDATE_LOCAL_STORAGE:
+    // 	return {
+    // 	    ...state,
+    // 	    store: action.store
+    default:
 	    return state;
     }
 };

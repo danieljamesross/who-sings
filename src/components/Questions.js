@@ -16,7 +16,7 @@ const fetchTracks = async (url) => {
    });
 
     // if the api call doesn't work, use local saved data
-    if (response.data.message.header.status_code == 200) {
+    if (response.data.message.header.status_code === 200) {
 	return response.data.message.body.track_list;
     } else {
 	return localApiData.message.body.track_list;
@@ -30,7 +30,7 @@ const fetchSnippet = async (id) => {
 	adapter: jsonpAdapter,
 	callbackParamName: 'callback' // optional, 'callback' by default
     });
-     if (response.data.message.header.status_code == 200) {
+     if (response.data.message.header.status_code === 200) {
 	 return response.data.message.body.snippet.snippet_body;
      } else {
 	 console.log(response.data.message.header.status_code);
@@ -83,7 +83,7 @@ const qNumArray = [...Array(100).keys()];
 // There's probably a more javascripty way, but I am used to the common lisp
 // (loop) macro and this is similar to how I'd do it in common lisp.
 
-const generateQuestions = () => {
+const generateQuestions = (num) => {
     /// these .then() statements make the whole thing work.
     // I'm sure there's a more elegant way, but hey-ho.
     return fetchTracks(mxm).then((tracks) => {
@@ -91,7 +91,7 @@ const generateQuestions = () => {
 	let j = 0;
 	const shuffArray = shuffle(qNumArray);
 	// Here we fill all the answers with track artists
-	for(var i = 0; i<5; i++) {
+	for(var i = 0; i<num; i++) {
 	    const questionItem = {};
 	    let k = shuffArray[j];
 	    questionItem.id = i + 1;

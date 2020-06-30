@@ -11,3 +11,6 @@ export const SET_COUNT = 'SET_COUNTER';
 export const SET_NAME = 'SET_NAME';
 export const SET_NAME_ERROR = 'SET_NAME_ERROR';
 export const QUESTIONS_LOADED = 'QUESTIONS_LOADED';
+export const IS_LOADING = 'IS_LOADING';
+export const SET_NEW_SCORE = 'SET_NEW_SCORE';
+export const UPDATE_LEADERBOARD = 'UPDATE_LEADERBOARD';
