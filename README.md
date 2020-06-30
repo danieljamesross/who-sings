@@ -23,8 +23,11 @@ Choose the artist that sings a specific line of lyrics, winning points for every
   - other technology choices like various JS libs, are up to you
 
 ### TODO:
-  - Make the API calls fill in the questions, async broken at the moment
-  - Save user data to localStorage. This is half broken at the moment, updates
-    just fine except `score` doesn't match the printed (actual) score.
-  - Log off button
-  - history game
+  - ~~Make the API calls fill in the questions, async broken at the moment~~ -
+    well, it does while I have enough calls left from the free API account
+  - ~~Save user data to localStorage. This is half broken at the moment, updates
+    just fine except `score` doesn't match the printed (actual) score.~~ - fixed
+  - ~~Log off button~~ - done
+  - ~~history game~~ - done
+  - Make the countdown clock do something when it ends
+  - re-jig screens so they match the "must have features: precisely.
