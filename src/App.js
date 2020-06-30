@@ -2,11 +2,9 @@ import React, { useReducer, useState, useRef, useEffect, useContext } from 'reac
 import generateQuestions from './components/Questions';
 import Progress from './components/Progress';
 import Question from './components/Question';
-import Player from './components/Player';
 import highScores from './components/HighScores';
 //import Counter from './components/Counter';
 import Answers from './components/Answers';
-//import Login from './components/Login';
 import QuizContext from './context/QuizContext';
 import {
     SET_ANSWERS,
@@ -23,7 +21,6 @@ import {
     SET_QUESTIONS,
     QUESTIONS_LOADED,
     IS_LOADING,
-    SET_NEW_SCORE,
     UPDATE_LEADERBOARD,
 //    UPDATE_LOCAL_STORAGE
 } from './reducers/Types.js';
@@ -51,13 +48,11 @@ function App() {
 
     const [state, dispatch] = useReducer(QuizReducer, initialState);
     const {score, currentQuestion, currentAnswer, answers, showResults, error, showPlayerScreen,count, name, nameError, questions, questionsLoaded, isLoading,} = state;
-    const d = new Date();
-    const month = d.getMonth() + 1;
-    const now = d.getDate() + '/' + month + '/' + d.getFullYear();
+    const now = new Date().toLocaleDateString();
     // We have to wait for the questions to be fetched from the API
     // before we can do anything. So we declare an async function...
     const setQuestions = async () => {
-	const qs = await generateQuestions(5); // how many questions?
+	const qs = await generateQuestions(1); // how many questions?
 	return dispatch({type: SET_QUESTIONS, questions: qs});
     };
     // ... and then call it once.
@@ -122,7 +117,7 @@ function App() {
 	dispatch({type: SET_NAME, name: ""});
 	dispatch({type: SET_SHOW_PLAYER_SCREEN, showPlayerScreen: true});
 	restart();
-    }
+    };
 
 
     const incScore = (question, answer) => {
@@ -137,7 +132,6 @@ function App() {
 
     const next = () => {
 	const answer = {questionId:question.id, answer: currentAnswer};
-	console.log(currentAnswer);
 	if (!currentAnswer) {
 	    dispatch({type: SET_ERROR, error: 'Please select an option'});
 	    return;
@@ -147,7 +141,6 @@ function App() {
 	dispatch({type: SET_CURRENT_ANSWER, currentAnswer: ''});
 
 	incScore(question, answer);
-	console.log("score: " + score + " q: " + question.id);
 
 	if (currentQuestion + 1 < questions.length) {
 	    dispatch({type: SET_CURRENT_QUESTION,
@@ -169,47 +162,37 @@ function App() {
 
     };
 
-    if (count <= 0) {
-	dispatch({type: SET_CURRENT_ANSWER, currentAnswer: 'd'});
-	next();
-	return;
-    };
-
   
-    // localStorage.setItem('highScores', JSON.stringify(highScores));
-    // dispatch({type: UPDATE_LEADERBOARD, highScores: highScores});
+    // const Counter = () => {
+    // 	const [time, setTime] = useState(new Date().toLocaleTimeString());
+    // 	const secondsPassed = useRef(count);
 
-    const Counter = () => {
-    	const [time, setTime] = useState(new Date().toLocaleTimeString());
-    	const secondsPassed = useRef(count);
+    // 	useEffect(() => {
+    // 	    const timeout = setTimeout(() => {
+    // 		const date = new Date();
+    // 		secondsPassed.current = secondsPassed.current - 1;
+    // 		setTime(date.toLocaleTimeString());
+    // 	    }, 1000);
+    // 	    return () => {
+    // 		clearTimeout(timeout);
+    // 	    };
+    // 	}, [time]);
 
-    	useEffect(() => {
-    	    const timeout = setTimeout(() => {
-    		const date = new Date();
-    		secondsPassed.current = secondsPassed.current - 1;
-    		setTime(date.toLocaleTimeString());
-    	    }, 1000);
-    	    return () => {
-    		clearTimeout(timeout);
-    	    };
-    	}, [time]);
-
-    	if(secondsPassed.current <= 0) {
-    	    dispatch({type: SET_CURRENT_ANSWER, currentAnswer: 'd'});
-    	    next();
-    	    return  (
-    		<div>
-    		    <div>Out of Time!</div>
-    		</div>
-    	    );
-    	} else {
-
-    	    return (
-    		<div>
-    		    <div>{secondsPassed.current} seconds remaining</div>
-    		</div>
-    	    );
-    }};
+    // 	if(secondsPassed.current <= 0) {
+    // 	    dispatch({type: SET_CURRENT_ANSWER, currentAnswer: 'd'});
+    // 	    next();
+    // 	    return  (
+    // 		<div>
+    // 		    <div>Out of Time!</div>
+    // 		</div>
+    // 	    );
+    // 	} else {
+    // 	    return (
+    // 		<div>
+    // 		    <div>{secondsPassed.current} seconds remaining</div>
+    // 		</div>
+    // 	    );
+    // }};
 
 
     const closePlayerScreen = () => {
@@ -223,7 +206,7 @@ function App() {
     };
 
     const showHighScores = () => {
-	if (highScores) {
+	if (highScores.length > 0) {
 	    let sorted = highScores;
 	    if (highScores.length > 1) {
 		sorted = highScores.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
@@ -243,21 +226,30 @@ function App() {
     };
 
     const showPlayerScores = () => {
-	const playerScores = [];
-	highScores.map((e, index) => {
-	    if (e.name == name) {
-		playerScores.push(<li key={index}>{e.score} on {e.time}</li>);
-	    }
-	});
-	if (playerScores){
-	    return (
-		<div className="results">
-		    <h3>{name}'s Recent Scores</h3>
-		    {playerScores}
-		</div>
-	    );
+	if (highScores.length > 0) {
+	    const playerScores = [];
+	    highScores.map((e, index) => {
+		if (e.name === name) {
+		    playerScores.push(<li key={index}>{e.score} on {e.time}</li>);
+		}
+		return playerScores;
+	    });
+	    if (playerScores){
+		return (
+		    <div className="results">
+			<h3>{name}'s Recent Scores</h3>
+			{playerScores}
+		    </div>
+		);
+	    } else return null;
 	} else return null;
-    }
+    };
+
+    const resetData = () => {
+	localStorage.clear();
+	dispatch({type: UPDATE_LEADERBOARD, highScores: []});
+	return;
+    };
 
     if (isLoading) {
 	return (
@@ -265,8 +257,7 @@ function App() {
 		<h3>Loading...</h3>
 	    </div>
 	);
-    } 
-    else if (showResults) {
+    } else if (showResults) {
 	return (
 	    <div className="container results">
 		<h2>Results</h2>
@@ -277,7 +268,7 @@ function App() {
 		    Restart</button>
 		<button className="btn btn-primary"
 		    onClick={logout}>
-		    Logout</button>
+		    Log Out</button>
 		{showHighScores()}
 		{showPlayerScores()}
 	    </div>
@@ -294,13 +285,16 @@ function App() {
 			       onChange={e => dispatch({
 				   type: SET_NAME,
 				   name: e.target.value})}
-			       placeholder={name}
+			       placeholder="Enter username..." 
 			/>
 		    </form>
 		    <button className="btn btn-primary"
 			    onClick={closePlayerScreen}>
 			Start
 		    </button>
+		<button className="btn btn-secondary"
+		    onClick={resetData}>
+		    Clear Saved Data</button>
 		</div>
 	    </QuizContext.Provider>
 	);
@@ -318,6 +312,10 @@ function App() {
 		    <button className="btn btn-primary"
 			onClick={next}>
 			Submit</button>
+		    <button className="btn btn-secondary"
+			    onClick={logout}>
+			Log Out</button>
+
 		</div>
 	    </QuizContext.Provider>
 	);

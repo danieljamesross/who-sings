@@ -13,7 +13,6 @@ import {
     SET_QUESTIONS,
     QUESTIONS_LOADED,
     IS_LOADING,
-    SET_NEW_SCORE,
     UPDATE_LEADERBOARD
 } from './Types.js';
 
@@ -39,15 +38,7 @@ function QuizReducer(state, action) {
 		...state,
 		isLoading: action.isLoading,
 	    };
-    case SET_NEW_SCORE:
-	return {
-	    ...state,
-	    newScore: {
-		name: action.name,
-		score: action.score,
-		time: action.time,
-	    },
-	};
+
     case QUESTIONS_LOADED:
 	return {
 	    ...state,
