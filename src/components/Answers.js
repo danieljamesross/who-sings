@@ -11,11 +11,13 @@ function Answers() {
 	    <Answer letter="a"
 		    answer={question.answer_a}
 		    dispatch={dispatch}
-		    selected={currentAnswer === 'a' }/>
+	selected={currentAnswer === 'a' }/>
+	    <br />
 	    <Answer letter="b"
 		    answer={question.answer_b}
 		    dispatch={dispatch}
-		    selected={currentAnswer === 'b' }/>
+	selected={currentAnswer === 'b' }/>
+	    <br />
 	    <Answer letter="c"
 		    answer={question.answer_c}
 		    dispatch={dispatch}

@@ -6,7 +6,7 @@ function Question() {
     const {currentQuestion, questions} = state;
     const question = questions[currentQuestion]; 
     return (
-	<h1 className="lyric">{question.question}</h1>
+	<h1 className="lyric">"{question.question}"</h1>
     );
 };
 

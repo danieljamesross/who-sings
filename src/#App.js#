@@ -85,7 +85,7 @@ function App() {
     };
 
     const renderScore = () => {
-	 console.log("Final score: " + score);
+	console.log("Final score: " + score);
 	return <span className="score">Score: {score} / {questions.length}</span>;
     };
 
