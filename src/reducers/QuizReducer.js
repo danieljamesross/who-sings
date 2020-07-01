@@ -1,18 +1,18 @@
 import {
     SET_CURRENT_ANSWER,
     SET_CURRENT_QUESTION,
+    SET_QUESTIONS,
+    IS_LOADING,
+    QUESTIONS_LOADED,
     SET_ERROR,
+    SET_NAME_ERROR,
     SET_SHOW_RESULTS,
+    SET_SHOW_PLAYER_SCREEN,
     SET_ANSWERS,
     SET_SCORE,
     RESET_QUIZ,
-    SET_SHOW_PLAYER_SCREEN,
     SET_COUNT,
     SET_NAME,
-    SET_NAME_ERROR,
-    SET_QUESTIONS,
-    QUESTIONS_LOADED,
-    IS_LOADING,
     UPDATE_LEADERBOARD
 } from './Types.js';
 
@@ -33,23 +33,22 @@ function QuizReducer(state, action) {
 		...state,
 		questions: action.questions,
 	    };
-    case IS_LOADING:
+	case IS_LOADING:
 	    return {
 		...state,
 		isLoading: action.isLoading,
 	    };
-
-    case QUESTIONS_LOADED:
-	return {
-	    ...state,
-	    questionsLoaded: action.questionsLoaded,
-	};
+	case QUESTIONS_LOADED:
+	    return {
+		...state,
+		questionsLoaded: action.questionsLoaded,
+	    };
 	case SET_ERROR:
 	    return {
 		...state,
 		error: action.error,
 	    };
-    case SET_NAME_ERROR:
+	case SET_NAME_ERROR:
 	    return {
 		...state,
 		nameError: action.nameError,
@@ -95,16 +94,12 @@ function QuizReducer(state, action) {
 		...state,
 		name: action.name,
 	    };
-    case UPDATE_LEADERBOARD:
-	return {
-	    ...state,
-	    highScores: action.highScores,
-	};
-    // case UPDATE_LOCAL_STORAGE:
-    // 	return {
-    // 	    ...state,
-    // 	    store: action.store
-    default:
+	case UPDATE_LEADERBOARD:
+	    return {
+		...state,
+		highScores: action.highScores,
+	    };
+	default:
 	    return state;
     }
 };

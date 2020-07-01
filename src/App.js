@@ -1,9 +1,8 @@
-import React, { useReducer, useState, useRef, useEffect, useContext } from 'react';
+import React, { useReducer } from 'react';
 import generateQuestions from './components/Questions';
 import Progress from './components/Progress';
 import Question from './components/Question';
 import highScores from './components/HighScores';
-//import Counter from './components/Counter';
 import Answers from './components/Answers';
 import QuizContext from './context/QuizContext';
 import {
@@ -22,7 +21,6 @@ import {
     QUESTIONS_LOADED,
     IS_LOADING,
     UPDATE_LEADERBOARD,
-//    UPDATE_LOCAL_STORAGE
 } from './reducers/Types.js';
 import QuizReducer from './reducers/QuizReducer.js';
 import './App.css';
@@ -40,19 +38,22 @@ function App() {
 	error: '',
 	highScores,
 	showPlayerScreen: true,
-	count: 3,
 	isLoading: true,
 	name: "",
 	nameError: "",
     };
 
     const [state, dispatch] = useReducer(QuizReducer, initialState);
-    const {score, currentQuestion, currentAnswer, answers, showResults, error, showPlayerScreen,count, name, nameError, questions, questionsLoaded, isLoading,} = state;
-    const now = new Date().toLocaleDateString();
+    const {score, currentQuestion, currentAnswer, answers, showResults, error,
+	   showPlayerScreen, name, nameError, questions, questionsLoaded,
+	   isLoading,} = state;
+    const now = new Date().toUTCString();
+
+    ////////////////////////////////////////////////////////////////////////////
     // We have to wait for the questions to be fetched from the API
     // before we can do anything. So we declare an async function...
     const setQuestions = async () => {
-	const qs = await generateQuestions(1); // how many questions?
+	const qs = await generateQuestions(5); // how many questions?
 	return dispatch({type: SET_QUESTIONS, questions: qs});
     };
     // ... and then call it once.
@@ -65,7 +66,9 @@ function App() {
     };
     
     const question = questions[currentQuestion];
-    
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Errors
     const renderError = () => {
 	if (!error) {
 	    return null;
@@ -80,6 +83,8 @@ function App() {
 	return <div className="error">{nameError}</div>;
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    // Renders
     const renderResultsMark = (question, answer) => {
 	if(question.correct_answer === answer.answer) {
 	    return <span className="correct">Correct</span>;
@@ -88,8 +93,9 @@ function App() {
     };
 
     const renderScore = () => {
-	 console.log("Final score: " + score);
-	return <span className="score">Score: {score} / {questions.length}</span>;
+	return (
+	    <span className="score">Score: {score} / {questions.length}</span>
+	);
     };
 
     const renderResultsData = () => {
@@ -99,8 +105,7 @@ function App() {
 	    );
 
 	    return (
-		<div key={question.id}>
-		    Q {question.id}:&nbsp;
+		<div key={question.id}>Q {question.id}:&nbsp;
 		    <span className="lyric">
 			"{question.question}"
 		    </span>&nbsp;-&nbsp;
@@ -109,6 +114,9 @@ function App() {
 	    );
 	});
     };
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Restarts
     const restart = () => {
 	dispatch({type: RESET_QUIZ});
     };
@@ -119,7 +127,14 @@ function App() {
 	restart();
     };
 
+    const resetData = () => {
+	localStorage.clear();
+	dispatch({type: UPDATE_LEADERBOARD, highScores: []});
+	return;
+    };
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // scores and navigation
     const incScore = (question, answer) => {
 	if(question.correct_answer === answer.answer) {
 	    dispatch({type: SET_SCORE, score: score + 1});
@@ -127,9 +142,7 @@ function App() {
 	return;
     };
 
-    
-
-
+    // Trigger next question
     const next = () => {
 	const answer = {questionId:question.id, answer: currentAnswer};
 	if (!currentAnswer) {
@@ -155,47 +168,14 @@ function App() {
 			  time: now,
 		      })
 		     });
-	    console.log("hs: " + highScores);
 	    localStorage.setItem("highScores", JSON.stringify(highScores));
 	    dispatch({type: SET_SHOW_RESULTS, showResults: true});
 	};
 
     };
 
-  
-    // const Counter = () => {
-    // 	const [time, setTime] = useState(new Date().toLocaleTimeString());
-    // 	const secondsPassed = useRef(count);
-
-    // 	useEffect(() => {
-    // 	    const timeout = setTimeout(() => {
-    // 		const date = new Date();
-    // 		secondsPassed.current = secondsPassed.current - 1;
-    // 		setTime(date.toLocaleTimeString());
-    // 	    }, 1000);
-    // 	    return () => {
-    // 		clearTimeout(timeout);
-    // 	    };
-    // 	}, [time]);
-
-    // 	if(secondsPassed.current <= 0) {
-    // 	    dispatch({type: SET_CURRENT_ANSWER, currentAnswer: 'd'});
-    // 	    next();
-    // 	    return  (
-    // 		<div>
-    // 		    <div>Out of Time!</div>
-    // 		</div>
-    // 	    );
-    // 	} else {
-    // 	    return (
-    // 		<div>
-    // 		    <div>{secondsPassed.current} seconds remaining</div>
-    // 		</div>
-    // 	    );
-    // }};
-
-
-    const closePlayerScreen = () => {
+    // Ensure there's a username
+    const startGame = () => {
 	if (!name) {
  	    dispatch({type: SET_NAME_ERROR, nameError: 'Please enter a username'});
  	    return;
@@ -205,6 +185,10 @@ function App() {
 	return;
     };
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Scores
+    
+    // High Scores using localStorage
     const showHighScores = () => {
 	if (highScores.length > 0) {
 	    let sorted = highScores;
@@ -224,7 +208,8 @@ function App() {
 	    );
 	} else return null;
     };
-
+    
+    // User's scores
     const showPlayerScores = () => {
 	if (highScores.length > 0) {
 	    const playerScores = [];
@@ -245,18 +230,20 @@ function App() {
 	} else return null;
     };
 
-    const resetData = () => {
-	localStorage.clear();
-	dispatch({type: UPDATE_LEADERBOARD, highScores: []});
-	return;
-    };
+    ////////////////////////////////////////////////////////////////////////////////
+    // Returns
+    // These chained if...else if... statements are not particularly elegant, 
+    // but they work. ;)
 
+    //loading screen
     if (isLoading) {
 	return (
 	    <div className="container loading">
 		<h3>Loading...</h3>
 	    </div>
 	);
+
+    // results	
     } else if (showResults) {
 	return (
 	    <div className="container results">
@@ -265,14 +252,16 @@ function App() {
 		{renderScore()}
 		<button className="btn btn-primary"
 		    onClick={restart}>
-		    Restart</button>
-		<button className="btn btn-primary"
+		    Replay</button>
+		<button className="btn btn-secondary"
 		    onClick={logout}>
 		    Log Out</button>
 		{showHighScores()}
 		{showPlayerScores()}
 	    </div>
 	);
+
+    // start screen
     } else if (showPlayerScreen) {
 	return (
 	    <QuizContext.Provider value={{state, dispatch}}>
@@ -289,16 +278,18 @@ function App() {
 			/>
 		    </form>
 		    <button className="btn btn-primary"
-			    onClick={closePlayerScreen}>
+			    onClick={startGame}>
 			Start
 		    </button>
-		<button className="btn btn-secondary"
-		    onClick={resetData}>
-		    Clear Saved Data</button>
+		    <button className="btn btn-secondary"
+			    onClick={resetData}>
+			Clear Saved Data</button>
 		</div>
+		
 	    </QuizContext.Provider>
 	);
     }
+    // quiz
     else {
 	return (
 	    <QuizContext.Provider value={{state, dispatch}}>

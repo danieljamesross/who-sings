@@ -2,10 +2,9 @@ import Axios from 'axios';
 import localApiData from '../api/trackList.json';
 import jsonpAdapter from 'axios-jsonp';
 const apikey = "29450db265149eeecee7b32fd83137fe";
-//const apikey = "4051c24e88f36a2617acaa1718d52021"; broken, exceeded limit
-const mxm = `https://api.musixmatch.com/ws/1.1/chart.tracks.get?format=jsonp&callback=callback&page=0&page_size=100&country=us&f_has_lyrics=1&apikey=${apikey}`;
-
-//https://api.musixmatch.com/ws/1.1/chart.tracks.get?format=jsonp&callback=callback&page=0&page_size=20&country=us&f_has_lyrics=1&apikey=29450db265149eeecee7b32fd83137fe
+//const apikey = "4051c24e88f36a2617acaa1718d52021"; old key, broken because exceeded limit
+const apiLength = 15;
+const mxm = `https://api.musixmatch.com/ws/1.1/chart.tracks.get?format=jsonp&callback=callback&page=0&page_size=${apiLength}&country=us&f_has_lyrics=1&apikey=${apikey}`;
 
 const fetchTracks = async (url) => {
 
@@ -15,7 +14,8 @@ const fetchTracks = async (url) => {
 	callbackParamName: 'callback' // optional, 'callback' by default
    });
 
-    // if the api call doesn't work, use local saved data
+    // If the API call doesn't work, use local saved data
+    // Mainly for testing purposes
     if (response.data.message.header.status_code === 200) {
 	return response.data.message.body.track_list;
     } else {
@@ -62,18 +62,18 @@ const shuffle = (array) => {
 const whichAnswer = () => {
     const rand = Math.floor(Math.random() * 3);
     switch (rand) {
-    case 0:
-	return 'a';
-    case 1:
-	return 'b';
-    case 2:
-	return 'c';
-    default:
-	return 'd';
+	case 0:
+	    return 'a';
+	case 1:
+	    return 'b';
+	case 2:
+	    return 'c';
+	default:
+	    return 'd';
     };
 };
 
-const qNumArray = [...Array(100).keys()];
+const qNumArray = [...Array(apiLength).keys()]; // for shuffling
 
 // Kinda hacky, but what we do is loop through a randomised list which
 // is equal to the total length of the API tracks call and set the answers
