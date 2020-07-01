@@ -1,9 +1,9 @@
 import Axios from 'axios';
 import localApiData from '../api/trackList.json';
 import jsonpAdapter from 'axios-jsonp';
-const apikey = "29450db265149eeecee7b32fd83137fe";
+const apikey = null;//"29450db265149eeecee7b32fd83137fe";
 //const apikey = "4051c24e88f36a2617acaa1718d52021"; broken, exceeded limit
-const mxm = `https://api.musixmatch.com/ws/1.1/chart.tracks.get?format=jsonp&callback=callback&page=0&page_size=100&country=us&f_has_lyrics=1&apikey=${apikey}`;
+const mxm = `https://api.musixmatch.com/ws/1.1/chart.tracks.get?format=jsonp&callback=callback&page=0&page_size=25&country=us&f_has_lyrics=1&apikey=${apikey}`;
 
 //https://api.musixmatch.com/ws/1.1/chart.tracks.get?format=jsonp&callback=callback&page=0&page_size=20&country=us&f_has_lyrics=1&apikey=29450db265149eeecee7b32fd83137fe
 
@@ -24,7 +24,7 @@ const fetchTracks = async (url) => {
 };
 
 const fetchSnippet = async (id) => {
-    const mxmSnippet = `https://api.musixmatch.com/ws/1.1/track.snippet.get?format=jsonp&callback=callback&track_id=${id}&apikey=${apikey}`;
+    const mxmSnippet = null;//`https://api.musixmatch.com/ws/1.1/track.snippet.get?format=jsonp&callback=callback&track_id=${id}&apikey=${apikey}`;
     const response = await Axios({
 	url: mxmSnippet,
 	adapter: jsonpAdapter,
@@ -34,7 +34,7 @@ const fetchSnippet = async (id) => {
 	 return response.data.message.body.snippet.snippet_body;
      } else {
 	 console.log(response.data.message.header.status_code);
-	 return "snippet";
+	 return "Just for testing";
      }
 };
 	
@@ -73,7 +73,7 @@ const whichAnswer = () => {
     };
 };
 
-const qNumArray = [...Array(100).keys()];
+const qNumArray = [...Array(25).keys()];
 
 // Kinda hacky, but what we do is loop through a randomised list which
 // is equal to the total length of the API tracks call and set the answers

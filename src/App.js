@@ -1,9 +1,7 @@
-import React, { useReducer, useState, useRef, useEffect, useContext } from 'react';
+import React, { useReducer } from 'react';
 import generateQuestions from './components/Questions';
 import Progress from './components/Progress';
 import Question from './components/Question';
-import highScores from './components/HighScores';
-//import Counter from './components/Counter';
 import Answers from './components/Answers';
 import QuizContext from './context/QuizContext';
 import {
@@ -22,13 +20,12 @@ import {
     QUESTIONS_LOADED,
     IS_LOADING,
     UPDATE_LEADERBOARD,
-//    UPDATE_LOCAL_STORAGE
 } from './reducers/Types.js';
 import QuizReducer from './reducers/QuizReducer.js';
 import './App.css';
 
 function App() {
-
+    const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
     const initialState = {
 	score: 0,
 	questions: [],
@@ -40,32 +37,31 @@ function App() {
 	error: '',
 	highScores,
 	showPlayerScreen: true,
-	count: 3,
+	count: 10,
 	isLoading: true,
 	name: "",
 	nameError: "",
     };
 
     const [state, dispatch] = useReducer(QuizReducer, initialState);
-    const {score, currentQuestion, currentAnswer, answers, showResults, error, showPlayerScreen,count, name, nameError, questions, questionsLoaded, isLoading,} = state;
-    const now = new Date().toLocaleDateString();
+    const {score, currentQuestion, currentAnswer, answers, showResults, error, showPlayerScreen,count, name, nameError, questions, questionsLoaded, isLoading} = state;
+    const now = new Date().toUTCString();
     // We have to wait for the questions to be fetched from the API
     // before we can do anything. So we declare an async function...
     const setQuestions = async () => {
-	const qs = await generateQuestions(1); // how many questions?
+	const qs = await generateQuestions(5); // how many questions?
 	return dispatch({type: SET_QUESTIONS, questions: qs});
     };
     // ... and then call it once.
     if (!questionsLoaded) {
-
 	setQuestions().then(() => {
 	    dispatch({type: IS_LOADING, isLoading: false});
 	    dispatch({type: QUESTIONS_LOADED, questionsLoaded: true});
 	});
     };
-    
+
     const question = questions[currentQuestion];
-    
+
     const renderError = () => {
 	if (!error) {
 	    return null;
@@ -88,7 +84,6 @@ function App() {
     };
 
     const renderScore = () => {
-	 console.log("Final score: " + score);
 	return <span className="score">Score: {score} / {questions.length}</span>;
     };
 
@@ -129,8 +124,10 @@ function App() {
 
     
 
+    let t;
 
     const next = () => {
+	clearTimeout(t);
 	const answer = {questionId:question.id, answer: currentAnswer};
 	if (!currentAnswer) {
 	    dispatch({type: SET_ERROR, error: 'Please select an option'});
@@ -145,7 +142,8 @@ function App() {
 	if (currentQuestion + 1 < questions.length) {
 	    dispatch({type: SET_CURRENT_QUESTION,
 		      currentQuestion: currentQuestion + 1});
-	    dispatch({type: SET_COUNT, count: 3});
+	    
+	    dispatch({type: SET_COUNT, count: 10});
 	    return;
 	} else {
 	    dispatch({type: UPDATE_LEADERBOARD,
@@ -154,47 +152,33 @@ function App() {
 			  score: score,
 			  time: now,
 		      })
-		     });
-	    console.log("hs: " + highScores);
+	    });
 	    localStorage.setItem("highScores", JSON.stringify(highScores));
 	    dispatch({type: SET_SHOW_RESULTS, showResults: true});
 	};
-
     };
-
-  
-    // const Counter = () => {
-    // 	const [time, setTime] = useState(new Date().toLocaleTimeString());
-    // 	const secondsPassed = useRef(count);
-
-    // 	useEffect(() => {
-    // 	    const timeout = setTimeout(() => {
-    // 		const date = new Date();
-    // 		secondsPassed.current = secondsPassed.current - 1;
-    // 		setTime(date.toLocaleTimeString());
-    // 	    }, 1000);
-    // 	    return () => {
-    // 		clearTimeout(timeout);
-    // 	    };
-    // 	}, [time]);
-
-    // 	if(secondsPassed.current <= 0) {
-    // 	    dispatch({type: SET_CURRENT_ANSWER, currentAnswer: 'd'});
-    // 	    next();
-    // 	    return  (
-    // 		<div>
-    // 		    <div>Out of Time!</div>
-    // 		</div>
-    // 	    );
-    // 	} else {
-    // 	    return (
-    // 		<div>
-    // 		    <div>{secondsPassed.current} seconds remaining</div>
-    // 		</div>
-    // 	    );
-    // }};
-
-
+    const timer = () => {
+	
+	if (count > 0) {
+	    t = setTimeout(() => {
+		dispatch({type: SET_COUNT, count: count - 1});
+	    }, 1000);
+	} else {
+	    clearTimeout(t);
+	    dispatch({type: SET_COUNT, count: "Out of Time"});
+	    // answer 'd' doesn't exist so this will be counted as
+	    // a wrong answer.
+	    dispatch({type: SET_CURRENT_ANSWER, currentAnswer: 'd'});
+	  
+	    next();
+	}
+	return (
+	    <div>
+		<h3>Time left: <span className="timer">{count}</span> secs</h3>
+	    </div>
+	);
+    };
+    
     const closePlayerScreen = () => {
 	if (!name) {
  	    dispatch({type: SET_NAME_ERROR, nameError: 'Please enter a username'});
@@ -248,6 +232,7 @@ function App() {
     const resetData = () => {
 	localStorage.clear();
 	dispatch({type: UPDATE_LEADERBOARD, highScores: []});
+	showPlayerScores();
 	return;
     };
 
@@ -312,10 +297,10 @@ function App() {
 		    <button className="btn btn-primary"
 			onClick={next}>
 			Submit</button>
+		    {timer()}
 		    <button className="btn btn-secondary"
 			    onClick={logout}>
 			Log Out</button>
-
 		</div>
 	    </QuizContext.Provider>
 	);
