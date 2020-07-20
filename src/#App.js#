@@ -342,7 +342,7 @@ function App() {
 		    <Question />
 		    {renderError()}
 		    <Answers />
-		    <span>{timer}</span>
+		    <h3>{timer}</h3> 
 		    <button className="btn btn-primary"
 			onClick={next}>
 			Submit</button>

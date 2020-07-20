@@ -10,6 +10,6 @@ export const SET_SHOW_PLAYER_SCREEN = 'SET_SHOW_PLAYER_SCREEN';
 export const SET_ANSWERS = 'SET_ANSWERS';
 export const SET_SCORE = 'SET_SCORE';
 export const RESET_QUIZ = 'RESET_QUIZ';
-export const SET_COUNT = 'SET_COUNTER';
+export const SET_TIMER = 'SET_TIMER';
 export const SET_NAME = 'SET_NAME';
 export const UPDATE_LEADERBOARD = 'UPDATE_LEADERBOARD';

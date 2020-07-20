@@ -11,7 +11,7 @@ import {
     SET_ANSWERS,
     SET_SCORE,
     RESET_QUIZ,
-    SET_COUNT,
+    SET_TIMER,
     SET_NAME,
     UPDATE_LEADERBOARD
 } from './Types.js';
@@ -84,11 +84,11 @@ function QuizReducer(state, action) {
 		error: '',
 		count: 10,
 	    };
-	case SET_COUNT:
-	    return {
-		...state,
-		count: action.count,
-	    };
+    case SET_TIMER:
+	return {
+	    ...state,
+	    timerOn: action.timerOn,
+	};
 	case SET_NAME:
 	    return {
 		...state,
